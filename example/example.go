@@ -3,6 +3,7 @@ package example
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -63,6 +64,21 @@ func (this *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write(b)
 		}
 	}(&write_result, &err, &data)
+	err = r.ParseForm()
+	if err != nil {
+		return
+	}
+	action := r.FormValue("a")
+	if action == "" {
+		err = fmt.Errorf("action is nil string")
+		return
+	}
+	h, ok := this.handlers[action]
+	if !ok {
+		err = fmt.Errorf("no such handle")
+		return
+	}
+	err = h(w, r, &write_result, &data)
 }
 
 func init() {
@@ -72,17 +88,17 @@ func init() {
 	s.handlers["del"] = s.del
 }
 
-func (this *Server) add(r http.ResponseWriter, w *http.Request, need_json *bool) error {
+func (this *Server) add(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
+	return fmt.Errorf("false error")
+}
+func (this *Server) update(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
 	return nil
 }
-func (this *Server) update(r http.ResponseWriter, w *http.Request, need_json *bool) error {
-	return nil
-}
-func (this *Server) del(r http.ResponseWriter, w *http.Request, need_json *bool) error {
+func (this *Server) del(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
 	return nil
 }
 
-type handle func(r http.ResponseWriter, w *http.Request, need_json *bool) error
+type handle func(r http.ResponseWriter, w *http.Request, need_json *bool, ret *interface{}) error
 
 type ret struct {
 	Code   int
