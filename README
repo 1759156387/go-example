@@ -1,0 +1,9 @@
+runserver:
+go get github.com/756445638/go-example
+cd ${GOPATH}/src/github.com/756445638/go-example
+go run example.go
+
+test_url:
+http://localhost:8080/?a=add&name=xxx&age=11
+http://localhost:8080/?a=update&name=xxx&age=22
+http://localhost:8080/?a=del&name=xxx
