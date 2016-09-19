@@ -8,7 +8,7 @@ http://localhost:8080/?a=add&name=xxx&age=11
 http://localhost:8080/?a=update&name=xxx&age=22
 http://localhost:8080/?a=del&name=xxx
 
-mysql:
+mysql: user=root passwd=123
 use test 
 create table user(
 	name varchar(255) not null,
