@@ -89,13 +89,34 @@ func init() {
 }
 
 func (this *Server) add(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	return fmt.Errorf("false error")
+	db, err := this.opendb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	_, err = db.Exec("insert into user values(?,?)", r.FormValue("name"), r.FormValue("age"))
+	*ret = "for test"
+	return err
 }
 func (this *Server) update(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	return nil
+	db, err := this.opendb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	_, err = db.Exec("update user set age=? where name=?", r.FormValue("age"), r.FormValue("name"))
+	*ret = "for test"
+	return err
 }
 func (this *Server) del(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	return nil
+	db, err := this.opendb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	_, err = db.Exec("delete from user where name=?", r.FormValue("name"))
+	*ret = "for test"
+	return err
 }
 
 type handle func(r http.ResponseWriter, w *http.Request, need_json *bool, ret *interface{}) error

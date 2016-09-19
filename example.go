@@ -14,7 +14,7 @@ var (
 func main() {
 	//go example.RunClient(&wg)
 
-	err := example.RunServer(&wg, ":8080", "root:123@")
+	err := example.RunServer(&wg, ":8080", "root:123@tcp(localhost:3306)/test?charset=utf8")
 	log.Fatalf("server is down,err:%v", err)
 
 	wg.Wait()
