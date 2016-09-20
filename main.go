@@ -28,7 +28,11 @@ type config struct {
 }
 
 func readConf() error {
-	filename := filepath.Abs(os.Args[0]) + "../conf/conf.json"
+	filename, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return err
+	}
+	filename += "/./conf/conf.json"
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
@@ -40,10 +44,10 @@ func main() {
 
 	err := readConf()
 	if err != nil {
-		panic(error)
+		panic(err)
 	}
 
-	err := example.RunServer(&wg, conf.Listen, conf.Mysql)
+	err = controller.RunServer(&wg, conf.Listen, conf.Mysql)
 	log.Fatalf("server is down,err:%v", err)
 
 	wg.Wait()

@@ -1,14 +1,13 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/756445638/go-example/models"
 )
 
 func RunClient(wg *sync.WaitGroup) {
@@ -23,6 +22,7 @@ func RunClient(wg *sync.WaitGroup) {
 	}
 }
 func RunServer(wg *sync.WaitGroup, addr string, mysql_addr string) error {
+	models.DBSTR = mysql_addr
 	wg.Add(1)
 	defer wg.Done()
 	s.mysql_addr = mysql_addr
@@ -33,11 +33,6 @@ func RunServer(wg *sync.WaitGroup, addr string, mysql_addr string) error {
 type Server struct {
 	mysql_addr string
 	handlers   map[string]handle
-}
-
-func (this *Server) opendb() (*sql.DB, error) {
-	return sql.Open("mysql", this.mysql_addr)
-
 }
 
 var (
@@ -83,40 +78,22 @@ func (this *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 	s.handlers = make(map[string]handle)
-	s.handlers["add"] = s.add
-	s.handlers["update"] = s.update
-	s.handlers["del"] = s.del
+	s.handlers["addUser"] = s.addUser
+	s.handlers["updateUser"] = s.updateUser
+	s.handlers["delUser"] = s.delUser
 }
 
-func (this *Server) add(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	db, err := this.opendb()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	_, err = db.Exec("insert into user values(?,?)", r.FormValue("name"), r.FormValue("age"))
+func (this *Server) addUser(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
 	*ret = "for test"
-	return err
+	return models.UserInstance.Add(r.FormValue("name"), r.FormValue("age"))
 }
-func (this *Server) update(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	db, err := this.opendb()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	_, err = db.Exec("update user set age=? where name=?", r.FormValue("age"), r.FormValue("name"))
+func (this *Server) updateUser(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
 	*ret = "for test"
-	return err
+	return models.UserInstance.Update(r.FormValue("name"), r.FormValue("age"))
 }
-func (this *Server) del(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
-	db, err := this.opendb()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	_, err = db.Exec("delete from user where name=?", r.FormValue("name"))
+func (this *Server) delUser(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
 	*ret = "for test"
-	return err
+	return models.UserInstance.Del(r.FormValue("name"), r.FormValue("age"))
 }
 
 type handle func(r http.ResponseWriter, w *http.Request, need_json *bool, ret *interface{}) error
