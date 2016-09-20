@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -19,7 +20,8 @@ var (
 )
 
 var (
-	conf config
+	conf_file = flag.String("c", "", "config file")
+	conf      config
 )
 
 type config struct {
@@ -28,11 +30,18 @@ type config struct {
 }
 
 func readConf() error {
-	filename, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return err
+	var filename string
+	var err error
+	if *conf_file == "" {
+		filename, err = filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			return err
+		}
+		filename += "/./conf/conf.json"
+	} else {
+		filename = *conf_file
 	}
-	filename += "/./conf/conf.json"
+
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
@@ -41,6 +50,7 @@ func readConf() error {
 }
 
 func main() {
+	flag.Parse()
 
 	err := readConf()
 	if err != nil {

@@ -1,12 +1,40 @@
 package models
 
+import (
+	"fmt"
+)
+
 type User struct {
-	Name string
-	Age  string
+	Number  string
+	Cust_id string
 }
 
 var UserInstance User
 
+func (this *User) AllUser(t interface{}, r *interface{}) error {
+	db, err := opendb()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	rows, err := db.Query("select number,cust_id from cust_inf")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	ret := []*User{}
+	for rows.Next() {
+		s := &User{}
+		err := rows.Scan(&s.Number, &s.Cust_id)
+		if err != nil {
+			fmt.Println("err:", err)
+			continue
+		}
+		ret = append(ret, s)
+	}
+	*r = ret
+	return err
+}
 func (this *User) Add(name, age interface{}) error {
 	db, err := opendb()
 	if err != nil {

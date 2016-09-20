@@ -55,7 +55,7 @@ func (this *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				ret.Data = *data
 			}
 
-			b, _ := json.Marshal(ret)
+			b, _ := json.MarshalIndent(ret, "", "\t")
 			w.Write(b)
 		}
 	}(&write_result, &err, &data)
@@ -81,6 +81,11 @@ func init() {
 	s.handlers["addUser"] = s.addUser
 	s.handlers["updateUser"] = s.updateUser
 	s.handlers["delUser"] = s.delUser
+	s.handlers["allUser"] = s.allUser
+}
+
+func (this *Server) allUser(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
+	return models.UserInstance.AllUser(r.FormValue("type"), ret)
 }
 
 func (this *Server) addUser(w http.ResponseWriter, r *http.Request, write_result *bool, ret *interface{}) error {
