@@ -1,4 +1,4 @@
-package example
+package controller
 
 import (
 	"database/sql"

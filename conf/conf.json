@@ -1,0 +1,4 @@
+{
+	"listen":":8080",
+	"mysql":"root:123@tcp(localhost:3306)/test?charset=utf8",
+}

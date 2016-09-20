@@ -1,23 +1,49 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sync"
 	"syscall"
 	"unsafe"
 
-	"github.com/756445638/go-example/example"
+	"github.com/756445638/go-example/controller"
 )
 
 var (
 	wg = sync.WaitGroup{}
 )
 
+var (
+	conf config
+)
+
+type config struct {
+	Listen string
+	Mysql  string
+}
+
+func readConf() error {
+	filename := filepath.Abs(os.Args[0]) + "../conf/conf.json"
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(b, &conf)
+}
+
 func main() {
-	//go example.RunClient(&wg)
-	go dll()
-	err := example.RunServer(&wg, ":8080", "root:123@tcp(localhost:3306)/test?charset=utf8")
+
+	err := readConf()
+	if err != nil {
+		panic(error)
+	}
+
+	err := example.RunServer(&wg, conf.Listen, conf.Mysql)
 	log.Fatalf("server is down,err:%v", err)
 
 	wg.Wait()
